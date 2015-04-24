@@ -7,7 +7,7 @@ namespace lightfm {
         public:
             FM(int k, std::default_random_engine e1);
             ~FM();
-            void learn(std::vector<int> indices, std::vector<double> weights, double target);
+            double learn(std::vector<int> indices, std::vector<double> weights, double target);
             double predict(std::vector<int> indices, std::vector<double> weights);
 
             // FIXME model params should be visible but this feel uncomfortable

@@ -66,29 +66,27 @@ double FM::predict(std::vector<int> indices, std::vector<double> weights) {
     return result;
 }
 
-void FM::learn(std::vector<int> indices, std::vector<double> weights, double target) {
-    double stepsize = 0.001;
+double FM::learn(std::vector<int> indices, std::vector<double> weights, double target) {
+    /* Returns current guess before learning.
+     */
+    // FIXME should be parameterized.
+    double stepsize = 0.01;
+    double reg = 0.01;
 
     // guess target
     double guess = predict(indices, weights);
 
     double err = guess - target;
-    /* std::cout << err << std::endl; */
 
-    // udpate
     // square loss
     //(target - guess) * grad
 
     // w0
-    /* std::cout << "w0 : " << w0; */
-    w0 -= err * stepsize * 1.0;
-    /* std::cout << " -> " << w0 << std::endl; */
+    w0 -= stepsize * err * 1.0;
     for (int i = 0; i < indices.size(); ++i) {
         int index = i;
         // wi
-        /* std::cout << "w_" << index << " : " << wi[index]; */
-        wi[index] -= err * stepsize * weights[i];
-        /* std::cout << " -> " << wi[index] << std::endl; */
+        wi[index] -= stepsize * (err * weights[i] + reg * wi[index]);
     }
 
     // vif
@@ -100,9 +98,9 @@ void FM::learn(std::vector<int> indices, std::vector<double> weights, double tar
                 // FIXME this term can be precomputed when guessing
                 tmp += vi[indices[j]][f] * weights[j];
             }
-            /* std::cout << "v_" << index << f << " : " << vi[index][f]; */
-            vi[index][f] -= err * stepsize * (weights[i] * tmp - vi[index][f] * pow(weights[i], 2));
-            /* std::cout << " -> " << vi[index][f] << std::endl; */
+            vi[index][f] -= stepsize * (err * (weights[i] * tmp - vi[index][f] * pow(weights[i], 2)) + reg * vi[index][f]);
         }
     }
+
+    return guess;
 }
