@@ -7,8 +7,8 @@ namespace lightfm {
         public:
             FM(int k, std::default_random_engine e1);
             ~FM();
-            double learn(std::vector<int> indices, std::vector<double> weights, double target);
-            double predict(std::vector<int> indices, std::vector<double> weights);
+            double learn(const std::vector<int> & indices, const std::vector<double> & weights, double target);
+            double predict(const std::vector<int> & indices, const std::vector<double> & weights);
 
             // FIXME model params should be visible but this feel uncomfortable
             double w0;  // global bias

@@ -41,7 +41,7 @@ int Featurizer::get_feature_index(std::string feature) {
     }
 }
 
-std::vector<int> Featurizer::get_feature_indices(std::vector<std::string> features) {
+std::vector<int> Featurizer::get_feature_indices(const std::vector<std::string> & features) {
     /* Return indices for given features. If an unseen string is met, it is
      * added to `index_table`.
      */

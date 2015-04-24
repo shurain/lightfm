@@ -19,7 +19,7 @@ FM::FM(int k, std::default_random_engine e1)
 FM::~FM() {
 }
 
-double FM::predict(std::vector<int> indices, std::vector<double> weights) {
+double FM::predict(const std::vector<int> & indices, const std::vector<double> & weights) {
     /* Calculate the prediction given features.
      * While naive implementation of pairwise interaction takes O(kn^2)
      * computation, this implementation takes O(kn). Refer to Lemma 3.1 of
@@ -47,7 +47,7 @@ double FM::predict(std::vector<int> indices, std::vector<double> weights) {
         // feature specific bias
         result += wi[index] * weights[i];
 
-        for (auto vif: vi[index]) {
+        for (auto& vif: vi[index]) {
             second += pow(vif, 2) * pow(weights[i], 2);
         }
     }
@@ -66,7 +66,7 @@ double FM::predict(std::vector<int> indices, std::vector<double> weights) {
     return result;
 }
 
-double FM::learn(std::vector<int> indices, std::vector<double> weights, double target) {
+double FM::learn(const std::vector<int> & indices, const std::vector<double> & weights, double target) {
     /* Returns current guess before learning.
      */
     // FIXME should be parameterized.
