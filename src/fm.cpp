@@ -74,6 +74,7 @@ double FM::learn(const std::vector<int> & indices, const std::vector<double> & w
     double reg = 0.01;
 
     // guess target
+    // This guarantees that weights are properly initialized.
     double guess = predict(indices, weights);
 
     double err = guess - target;
@@ -84,7 +85,8 @@ double FM::learn(const std::vector<int> & indices, const std::vector<double> & w
     // w0
     w0 -= stepsize * err * 1.0;
     for (int i = 0; i < indices.size(); ++i) {
-        int index = i;
+        int index = indices[i];
+
         // wi
         wi[index] -= stepsize * (err * weights[i] + reg * wi[index]);
     }

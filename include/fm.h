@@ -19,7 +19,7 @@ namespace lightfm {
             std::default_random_engine e1;
             std::normal_distribution<> d;
 
+            // dimension of factorization
             int k;
-
     };
 }
