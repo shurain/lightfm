@@ -30,7 +30,9 @@ void fail(Args...args) { error_print(args...);failed__ = true; }
 #define ASSERT_TRUE(x) if (!(x)) fail(__FILE__ ":", __LINE__, ": Assert fail: expected ", #x, " is true, at " __FILE__ ":",__LINE__)
 #define ASSERT_EQUAL(a, b) if ((a) != (b)) fail(__FILE__ ":", __LINE__, ": Assert fail: expected ", (a), " actual " , (b),  ", " #a " == " #b ", at " __FILE__ ":",__LINE__)
 #define ASSERT_NOTEQUAL(a, b) if ((a) == (b)) fail(__FILE__ ":", __LINE__, ": Assert fail: not expected ", (a), ", " #a " != " #b ", at " __FILE__ ":",__LINE__)
-#define ASSERT_FLOAT_EQUAL(a, b) if (((a) == (b)) || (fabs((a) - (b)) <= ( (fabs((a)) > fabs((b)) ? fabs((b)) : fabs((a))) * std::numeric_limits<double>::epsilon())) ) fail(__FILE__ ":", __LINE__, ": Assert fail: expected ", (a), " actual  ", (b), ", " #a " == " #b ", at " __FILE__ ":",__LINE__)
+// Assuming 0.000001 has enough resolution.
+#define ASSERT_FLOAT_EQUAL(a, b) if (((a) != (b)) && (fabs((a) - (b)) > ( (fabs((a)) > fabs((b)) ? fabs((b)) : fabs((a))) * 0.000001)) ) fail(__FILE__ ":", __LINE__, ": Assert fail: expected ", (a), " actual  ", (b), ", " #a " == " #b ", at " __FILE__ ":",__LINE__)
+#define ASSERT_FLOAT_NOTEQUAL(a, b) if (((a) == (b)) || (fabs((a) - (b)) <= ( (fabs((a)) > fabs((b)) ? fabs((b)) : fabs((a))) * 0.000001)) ) fail(__FILE__ ":", __LINE__, ": Assert fail: expected ", (a), " actual  ", (b), ", " #a " != " #b ", at " __FILE__ ":",__LINE__)
 
 
 
@@ -86,6 +88,7 @@ int main() {
 
     tmp /= 2.0;
     result += tmp;
+    ASSERT_FLOAT_EQUAL(3.0, 3.0000000000000000000000000001);
     ASSERT_FLOAT_EQUAL(result, guess);
 
     // learning
