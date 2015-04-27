@@ -15,7 +15,7 @@ Parser::Parser(Featurizer & featurizer)
 Parser::~Parser() {
 }
 
-void Parser::read_data(const std::string filename, std::vector<double> & targets, std::vector<std::vector<int>> & feature_indices, std::vector<std::vector<double>> & feature_weights) {
+void Parser::read_data(const std::string filename, std::vector<double> & targets, std::vector<std::vector<uint32_t>> & feature_indices, std::vector<std::vector<double>> & feature_weights) {
     std::ifstream data (filename, std::ifstream::in);
 
     std::string line;
@@ -31,7 +31,7 @@ void Parser::read_data(const std::string filename, std::vector<double> & targets
                 abort();
             }
 
-            std::vector<int> feature_index;
+            std::vector<uint32_t> feature_index;
             std::vector<double> feature_weight;
 
             std::string::size_type pos = line.find(' ') + 1;

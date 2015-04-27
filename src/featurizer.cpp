@@ -1,19 +1,19 @@
+#include <cmath>
+
 #include "featurizer.h"
+#include "hash.h"
 
 using namespace lightfm;
 
-Featurizer::Featurizer()
+DictFeaturizer::DictFeaturizer()
     : num(0)
 {}
 
-Featurizer::~Featurizer() {
-}
-
-int Featurizer::size() {
+int DictFeaturizer::size() {
     return this->num;
 }
 
-int Featurizer::add_feature(std::string feature) {
+int DictFeaturizer::add_feature(std::string feature) {
     /* Assign an index to a string. If the given string already exists,
      * silently ignore it. Returns the total number of indices maintained.
      */
@@ -27,7 +27,7 @@ int Featurizer::add_feature(std::string feature) {
 }
 
 
-int Featurizer::get_feature_index(std::string feature) {
+uint32_t DictFeaturizer::get_feature_index(std::string feature) {
     /* Return the index for a given feature. If an unseen string is met, it is
      * added to `index_table`.
      */
@@ -41,11 +41,36 @@ int Featurizer::get_feature_index(std::string feature) {
     }
 }
 
-std::vector<int> Featurizer::get_feature_indices(const std::vector<std::string> & features) {
+int HashFeaturizer::size() {
+    return pow(2, this->bit);
+}
+
+std::vector<uint32_t> DictFeaturizer::get_feature_indices(const std::vector<std::string> & features) {
     /* Return indices for given features. If an unseen string is met, it is
      * added to `index_table`.
      */
-    std::vector<int> indices;
+    std::vector<uint32_t> indices;
+    for (auto const& x: features) {
+        indices.push_back(get_feature_index(x));
+    }
+    return indices;
+}
+
+
+HashFeaturizer::HashFeaturizer(int bit, int seed)
+    :bit(bit)
+    , seed(seed)
+{
+    mask = (1 << bit) - 1;
+}
+
+uint32_t HashFeaturizer::get_feature_index(std::string feature) {
+    return uniform_hash(feature.c_str(), feature.size(), seed) & mask;
+}
+
+
+std::vector<uint32_t> HashFeaturizer::get_feature_indices(const std::vector<std::string> & features) {
+    std::vector<uint32_t> indices;
     for (auto const& x: features) {
         indices.push_back(get_feature_index(x));
     }

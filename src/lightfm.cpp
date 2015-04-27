@@ -16,10 +16,13 @@ int main() {
 
     string line;
 
-    Featurizer featurizer = Featurizer();
+    int bit = 20;
+    int rng_seed = 43;
+    HashFeaturizer featurizer = HashFeaturizer(bit, rng_seed);
+    /* DictFeaturizer featurizer = DictFeaturizer(); */
 
     vector<double> targets;
-    vector<vector<int>> feature_indices;
+    vector<vector<uint32_t>> feature_indices;
     vector<vector<double>> feature_weights;
 
     cout << "Loading train data..." << endl;
@@ -30,7 +33,7 @@ int main() {
     cout << "Number of rows: " << targets.size() << "\t" << "number of features: " << featurizer.size() << endl;
 
     vector<double> test_targets;
-    vector<vector<int>> test_feature_indices;
+    vector<vector<uint32_t>> test_feature_indices;
     vector<vector<double>> test_feature_weights;
 
     parser.read_data(test_file, test_targets, test_feature_indices, test_feature_weights);

@@ -37,17 +37,11 @@ void fail(Args...args) { error_print(args...);failed__ = true; }
 
 
 int main() {
-    Featurizer f = Featurizer();
-    ASSERT_EQUAL(0, f.size());
-    ASSERT_NOTEQUAL(1, f.size());
-
+    DictFeaturizer f = DictFeaturizer();
     vector<string> features = {"what", "i", "cannot", "create", "i", "do", "not", "understand"};
-    for (auto const& x: features) {
-        f.add_feature(x);
-    }
-    ASSERT_EQUAL(7, f.size());  // `i` is counted twice.
+    f.get_feature_indices(features);
 
-    vector<int> indices = f.get_feature_indices(vector<string>({"i", "cannot", "tell", "you", "what", "knowledge", "is" }));
+    vector<uint32_t> indices = f.get_feature_indices(vector<string>({"i", "cannot", "tell", "you", "what", "knowledge", "is" }));
     ASSERT_EQUAL(10, indices[indices.size() - 1]);
 
     // proper randomized algorithm should use random_device
@@ -56,7 +50,7 @@ int main() {
 
     default_random_engine e1(seed);
 
-    vector<int> guess_index({0, 1, 2});
+    vector<uint32_t> guess_index({0, 1, 2});
     vector<double> guess_weights({1.5, 0.2, 2.0});
 
     // 3 feauters
@@ -137,7 +131,8 @@ int main() {
                     // Don't let the algorithm peak at the answer.
                     continue;
                 }
-                fm2.learn({i, 3 + j}, {1.0, 1.0}, targets[i][j]);
+                vector<uint32_t> l({(uint32_t)i, (uint32_t)3 + j});
+                fm2.learn(l, {1.0, 1.0}, targets[i][j]);
             }
         }
     }
@@ -146,7 +141,52 @@ int main() {
     guess = fm2.predict({2, 6}, {1.0, 1.0});
     target = -1.19567812;
     final_error = guess - target;
+    cout << "DictFeaturizer" << endl;
+    cout << "initial error : " << initial_error << "\t" << "final error : " << final_error << endl;
     ASSERT_TRUE((final_error) < (initial_error));
+
+
+    int bit = 18;
+    int rng_seed = 42;
+    HashFeaturizer f2 = HashFeaturizer(bit, rng_seed);
+    vector<uint32_t> hash_indices = f2.get_feature_indices(features);
+    ASSERT_EQUAL(hash_indices[0], 81566);
+
+
+    FM fm3 = FM(pow(2, bit), k, e1);
+
+    initial_error = 0.0;
+    guess = fm3.predict({2, 6}, {1.0, 1.0});
+    target = -1.19567812;
+    initial_error = guess - target;
+
+    epoch = 30000;
+    vector<string> feature_string = {"user0", "user1", "user2", "item0", "item1", "item2", "item3"};
+    for (int r = 0; r < epoch; ++r) {
+        for (int i = 0; i < 3; ++i) {
+            // each user
+            for (int j = 0; j < 4; ++j) {
+                // each item
+                if (i == 2 && j == 3) {
+                    // Don't let the algorithm peak at the answer.
+                    continue;
+                }
+                // for (auto & x: f2.get_feature_indices({feature_string[i], feature_string[3 + j]})) {
+                //     cout << x << endl;
+                // }
+                fm3.learn(f2.get_feature_indices({feature_string[i], feature_string[3 + j]}), {1.0, 1.0}, targets[i][j]);
+            }
+        }
+    }
+
+    final_error = 0.0;
+    guess = fm3.predict(f2.get_feature_indices({feature_string[2], feature_string[6]}), {1.0, 1.0});
+    target = -1.19567812;
+    final_error = guess - target;
+    cout << "HashFeaturizer" << endl;
+    cout << "initial error : " << initial_error << "\t" << "final error : " << final_error << endl;
+    ASSERT_TRUE((final_error) < (initial_error));
+
 
     return 0;
 }
