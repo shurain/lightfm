@@ -3,9 +3,9 @@
 #include <fstream>
 #include <cmath>
 
-#include "util.h"
 #include "featurizer.h"
 #include "fm.h"
+#include "parser.h"
 
 using namespace lightfm;
 using namespace std;
@@ -14,8 +14,6 @@ int main() {
     const string train_file ("/Users/shurain/prj/recsys/data/ra.train.shuffled.libfm");
     const string test_file ("/Users/shurain/prj/recsys/data/ra.test.shuffled.libfm");
 
-    ifstream training_data (train_file);
-    ifstream test_data (test_file);
     string line;
 
     Featurizer featurizer = Featurizer();
@@ -24,27 +22,9 @@ int main() {
     vector<vector<int>> feature_indices;
     vector<vector<double>> feature_weights;
 
-    // Load data and create feature vector from it.
-    if (training_data.is_open()) {
-        cout << "Loading train data..." << endl;
-        while(getline(training_data, line)) {
-            vector<string> tokens = split(line, ' ');
-
-            // First token is the target
-            targets.push_back(stod(tokens[0]));
-
-            vector<int> feature_index;
-            vector<double> feature_weight;
-            // Rest of the tokens are the features
-            for (int i = 1; i < tokens.size(); ++i) {
-                vector<string> feat = split(tokens[i], ':');
-                feature_index.push_back(featurizer.get_feature_index(feat[0]));
-                feature_weight.push_back(stod(feat[1]));
-            }
-            feature_indices.push_back(feature_index);
-            feature_weights.push_back(feature_weight);
-        }
-    }
+    cout << "Loading train data..." << endl;
+    Parser parser = Parser(featurizer);
+    parser.read_data(train_file, targets, feature_indices, feature_weights);
 
     cout << "Loaded data" << endl;
     cout << "Number of rows: " << targets.size() << "\t" << "number of features: " << featurizer.size() << endl;
@@ -53,26 +33,8 @@ int main() {
     vector<vector<int>> test_feature_indices;
     vector<vector<double>> test_feature_weights;
 
-    if (test_data.is_open()) {
-        cout << "Loading test data..." << endl;
-        while(getline(test_data, line)) {
-            vector<string> tokens = split(line, ' ');
-
-            // First token is the target
-            test_targets.push_back(stod(tokens[0]));
-
-            vector<int> feature_index;
-            vector<double> feature_weight;
-            // Rest of the tokens are the features
-            for (int i = 1; i < tokens.size(); ++i) {
-                vector<string> feat = split(tokens[i], ':');
-                feature_index.push_back(featurizer.get_feature_index(feat[0]));
-                feature_weight.push_back(stod(feat[1]));
-            }
-            test_feature_indices.push_back(feature_index);
-            test_feature_weights.push_back(feature_weight);
-        }
-    }
+    parser.read_data(test_file, test_targets, test_feature_indices, test_feature_weights);
+    cout << "Test data rows: " << test_targets.size() << "\t" << "number of features: " << featurizer.size() << endl;
 
     int seed = 42;
     int epoch = 10;

@@ -7,7 +7,7 @@ BINDIR=bin
 OBJDIR=build
 SRCDIR=src
 
-_OBJS=featurizer.o util.o fm.o
+_OBJS=featurizer.o fm.o parser.o
 OBJS=$(patsubst %,$(OBJDIR)/%,$(_OBJS))
 
 all: $(BINDIR)/test $(BINDIR)/lightfm
