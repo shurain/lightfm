@@ -55,10 +55,12 @@ int main() {
     int k = 3;
 
     default_random_engine e1(seed);
-    FM fm = FM(k, e1);
 
     vector<int> guess_index({0, 1, 2});
     vector<double> guess_weights({1.5, 0.2, 2.0});
+
+    // 3 feauters
+    FM fm = FM(3, k, e1);
     double guess = fm.predict(guess_index, guess_weights);
     ASSERT_EQUAL(guess_index.size(), fm.vi.size());
     ASSERT_EQUAL(k, fm.vi[0].size());
@@ -117,7 +119,8 @@ int main() {
     };
 
     k = 2;
-    FM fm2 = FM(k, e1);
+    // Seven features (3 user, 4 item)
+    FM fm2 = FM(7, k, e1);
 
     double initial_error = 0.0;
     guess = fm2.predict({2, 6}, {1.0, 1.0});

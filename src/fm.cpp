@@ -6,14 +6,25 @@
 
 using namespace lightfm;
 
-FM::FM(int k, std::default_random_engine e1)
+FM::FM(int dim, int k, std::default_random_engine e1)
     : e1(e1)
     , k(k)
+    , dim(dim)
 {
     // FIXME weight initialization should be parameterized
     d = std::normal_distribution<>(0, 0.01);
 
     w0 = d(e1);
+    std::vector<double> w(dim);
+    std::generate_n(w.begin(), dim, [&]{ return d(e1);});
+    wi = std::move(w);
+
+    for (int i = 0; i < dim; ++i) {
+        std::vector<double> v(k);
+        std::generate_n(v.begin(), k, [&]{ return d(e1);});
+
+        vi.push_back(v);
+    }
 }
 
 FM::~FM() {
@@ -34,15 +45,6 @@ double FM::predict(const std::vector<int> & indices, const std::vector<double> &
 
     for (int i = 0; i < indices.size(); ++i) {
         int index = indices[i];
-        while (index >= wi.size()) {
-            // Unseen index. Initialize weights.
-            wi.push_back(d(e1));
-
-            std::vector<double> v(k);
-            std::generate_n(v.begin(), k, [&]{ return d(e1);});
-
-            vi.push_back(v);
-        }
 
         // feature specific bias
         result += wi[index] * weights[i];
@@ -74,7 +76,6 @@ double FM::learn(const std::vector<int> & indices, const std::vector<double> & w
     double reg = 0.01;
 
     // guess target
-    // This guarantees that weights are properly initialized.
     double guess = predict(indices, weights);
 
     double err = guess - target;

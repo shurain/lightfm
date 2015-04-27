@@ -79,7 +79,7 @@ int main() {
     int k = 10;
     default_random_engine e1(seed);
 
-    FM fm = FM(k, e1);
+    FM fm = FM(featurizer.size(), k, e1);
 
     for (int i = 0; i < epoch; ++i) {
         double train_error = 0.0;

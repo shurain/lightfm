@@ -5,7 +5,7 @@
 namespace lightfm {
     class FM {
         public:
-            FM(int k, std::default_random_engine e1);
+            FM(int dim, int k, std::default_random_engine e1);
             ~FM();
             double learn(const std::vector<int> & indices, const std::vector<double> & weights, double target);
             double predict(const std::vector<int> & indices, const std::vector<double> & weights);
@@ -21,5 +21,7 @@ namespace lightfm {
 
             // dimension of factorization
             int k;
+            // feature dimension
+            int dim;
     };
 }
