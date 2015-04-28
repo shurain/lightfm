@@ -15,7 +15,7 @@ Parser::Parser(Featurizer & featurizer)
 Parser::~Parser() {
 }
 
-void Parser::read_data(const std::string filename, std::vector<double> & targets, std::vector<std::vector<uint32_t>> & feature_indices, std::vector<std::vector<double>> & feature_weights) {
+void Parser::read_data(const std::string filename, std::vector<double> & targets, std::vector<std::vector<std::string>> & features, std::vector<std::vector<double>> & feature_weights) {
     std::ifstream data (filename, std::ifstream::in);
 
     std::string line;
@@ -31,7 +31,7 @@ void Parser::read_data(const std::string filename, std::vector<double> & targets
                 abort();
             }
 
-            std::vector<uint32_t> feature_index;
+            std::vector<std::string> feature_index;
             std::vector<double> feature_weight;
 
             std::string::size_type pos = line.find(' ') + 1;
@@ -47,7 +47,7 @@ void Parser::read_data(const std::string filename, std::vector<double> & targets
                 std::string feature = line.substr(pos, split-pos);
                 double val = stof(line.substr(split+1));
 
-                feature_index.push_back(feat.get_feature_index(feature));
+                feature_index.push_back(feature);
                 feature_weight.push_back(val);
 
                 pos = next + 1;
@@ -56,7 +56,7 @@ void Parser::read_data(const std::string filename, std::vector<double> & targets
                     break;
                 }
             }
-            feature_indices.push_back(feature_index);
+            features.push_back(feature_index);
             feature_weights.push_back(feature_weight);
         }
     }

@@ -10,13 +10,10 @@ SRCDIR=src
 _OBJS=featurizer.o fm.o parser.o hash.o
 OBJS=$(patsubst %,$(OBJDIR)/%,$(_OBJS))
 
-all: $(BINDIR)/test $(BINDIR)/lightfm
+all: $(BINDIR)/lightfm
 
 run:
 	@$(BINDIR)/lightfm
-
-test:
-	@$(BINDIR)/test
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	@mkdir -p $(OBJDIR)
@@ -25,10 +22,6 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 $(BINDIR)/lightfm: $(OBJS) $(OBJDIR)/lightfm.o
 	@mkdir -p $(BINDIR)
 	$(CC) -o $(BINDIR)/lightfm $^
-
-$(BINDIR)/test: $(OBJS) $(OBJDIR)/test.o
-	@mkdir -p $(BINDIR)
-	$(CC) -o $(BINDIR)/test $^
 
 clean:
 	@rm -rf $(OBJDIR) $(BINDIR)

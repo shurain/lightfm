@@ -16,27 +16,27 @@ int main() {
 
     string line;
 
-    int bit = 20;
+    int bit = 21;
     int rng_seed = 43;
     HashFeaturizer featurizer = HashFeaturizer(bit, rng_seed);
     /* DictFeaturizer featurizer = DictFeaturizer(); */
 
     vector<double> targets;
-    vector<vector<uint32_t>> feature_indices;
+    vector<vector<string>> features;
     vector<vector<double>> feature_weights;
 
     cout << "Loading train data..." << endl;
     Parser parser = Parser(featurizer);
-    parser.read_data(train_file, targets, feature_indices, feature_weights);
+    parser.read_data(train_file, targets, features, feature_weights);
 
     cout << "Loaded data" << endl;
     cout << "Number of rows: " << targets.size() << "\t" << "number of features: " << featurizer.size() << endl;
 
     vector<double> test_targets;
-    vector<vector<uint32_t>> test_feature_indices;
+    vector<vector<string>> test_features;
     vector<vector<double>> test_feature_weights;
 
-    parser.read_data(test_file, test_targets, test_feature_indices, test_feature_weights);
+    parser.read_data(test_file, test_targets, test_features, test_feature_weights);
     cout << "Test data rows: " << test_targets.size() << "\t" << "number of features: " << featurizer.size() << endl;
 
     int seed = 42;
@@ -44,17 +44,19 @@ int main() {
     int k = 10;
     default_random_engine e1(seed);
 
-    FM fm = FM(featurizer.size(), k, e1);
+    FM fm = FM(featurizer.size(), k, featurizer, e1);
+
+    cout << "Begin training" << endl;
 
     for (int i = 0; i < epoch; ++i) {
         double train_error = 0.0;
         for (int j = 0; j < targets.size(); ++j) {
-            double guess = fm.learn(feature_indices[j], feature_weights[j], targets[j]);
+            double guess = fm.learn(features[j], feature_weights[j], targets[j]);
             train_error += pow(guess - targets[j], 2);
         }
         double total_error = 0.0;
         for (int l = 0; l < test_targets.size(); ++l) {
-            double guess = fm.predict(test_feature_indices[l], test_feature_weights[l]);
+            double guess = fm.predict(test_features[l], test_feature_weights[l]);
             double partial_error = pow(guess - test_targets[l], 2);
             total_error += partial_error;
         }
