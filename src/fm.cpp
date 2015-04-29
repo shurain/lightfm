@@ -104,12 +104,6 @@ double FM::learn(const std::vector<uint32_t> & indices, const std::vector<double
     for (int f = 0; f < k; ++f) {
         for (int i = 0; i < indices.size(); ++i) {
             uint32_t index = indices[i];
-            // vif_dot_wi contains the precomputed values for the following
-            // double tmp = 0.0;
-            // for (int j = 0; j < indices.size(); ++j) {
-            //     tmp += vi[indices[j]][f] * weights[j];
-            // }
-            // tmp == vif_dot_wi[f];
 
             double v = vi[index][f];
             vi[index][f] = v -  learning_rate * (err * (weights[i] * vif_dot_wi[f] - v * pow(weights[i], 2)) + v_reg * v);
