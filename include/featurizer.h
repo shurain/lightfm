@@ -3,6 +3,7 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <cstdint>
 
 #include "hash.h"
 
@@ -40,6 +41,6 @@ namespace lightfm
         private:
             int bit;
             int seed;
-            int mask;
+            uint32_t mask;
     };
 }

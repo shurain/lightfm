@@ -6,12 +6,14 @@
 
 using namespace lightfm;
 
-FM::FM(int dim, int k, std::default_random_engine e1)
-    : e1(e1)
-    , k(k)
+FM::FM(int dim, int k, double w_reg, double v_reg, double learning_rate, double stdev, std::default_random_engine e1)
+    : e1(e1),
+    k(k),
+    w_reg(w_reg),
+    v_reg(v_reg),
+    learning_rate(learning_rate)
 {
-    // FIXME weight initialization should be parameterized
-    d = std::normal_distribution<>(0, 0.01);
+    d = std::normal_distribution<>(0, stdev);
 
     w0 = d(e1);
     std::vector<double> w(dim);
@@ -78,9 +80,6 @@ double FM::predict(const std::vector<uint32_t> & indices, const std::vector<doub
 double FM::learn(const std::vector<uint32_t> & indices, const std::vector<double> & weights, double target) {
     /* Returns current guess before learning.
      */
-    // FIXME should be parameterized.
-    double stepsize = 0.01;
-    double reg = 0.01;
 
     // guess target
     std::vector<double> vif_dot_wi(k);
@@ -92,13 +91,13 @@ double FM::learn(const std::vector<uint32_t> & indices, const std::vector<double
     //(target - guess) * grad
 
     // w0
-    w0 -= stepsize * err;
+    w0 -= learning_rate * err;
     for (int i = 0; i < indices.size(); ++i) {
         uint32_t index = indices[i];
 
         // wi
         double w = wi[index];
-        wi[index] = w - stepsize * (err * weights[i] + reg * w);
+        wi[index] = w - learning_rate * (err * weights[i] + w_reg * w);
     }
 
     // vif
@@ -113,7 +112,7 @@ double FM::learn(const std::vector<uint32_t> & indices, const std::vector<double
             // tmp == vif_dot_wi[f];
 
             double v = vi[index][f];
-            vi[index][f] = v -  stepsize * (err * (weights[i] * vif_dot_wi[f] - v * pow(weights[i], 2)) + reg * v);
+            vi[index][f] = v -  learning_rate * (err * (weights[i] * vif_dot_wi[f] - v * pow(weights[i], 2)) + v_reg * v);
         }
     }
 

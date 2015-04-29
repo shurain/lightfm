@@ -44,7 +44,12 @@ int main() {
     int k = 10;
     default_random_engine e1(seed);
 
-    FM fm = FM(featurizer.size(), k, e1);
+    double w_reg = 0.01;
+    double v_reg = 0.01;
+    double learning_rate = 0.01;
+    double stdev = 0.01;
+
+    FM fm = FM(featurizer.size(), k, w_reg, v_reg, learning_rate, stdev, e1);
 
     for (int i = 0; i < epoch; ++i) {
         double train_error = 0.0;

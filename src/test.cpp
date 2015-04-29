@@ -53,8 +53,13 @@ int main() {
     vector<uint32_t> guess_index({0, 1, 2});
     vector<double> guess_weights({1.5, 0.2, 2.0});
 
+    double learning_rate = 0.01;
+    double w_reg = 0.01;
+    double v_reg = 0.01;
+    double stdev = 0.01;
+
     // 3 feauters
-    FM fm = FM(3, k, e1);
+    FM fm = FM(3, k, w_reg, v_reg, learning_rate, stdev, e1);
     double guess = fm.predict(guess_index, guess_weights);
     ASSERT_EQUAL(guess_index.size(), fm.vi.size());
     ASSERT_EQUAL(k, fm.vi[0].size());
@@ -114,7 +119,7 @@ int main() {
 
     k = 2;
     // Seven features (3 user, 4 item)
-    FM fm2 = FM(7, k, e1);
+    FM fm2 = FM(7, k, w_reg, v_reg, learning_rate, stdev, e1);
 
     double initial_error = 0.0;
     guess = fm2.predict({2, 6}, {1.0, 1.0});
@@ -153,7 +158,7 @@ int main() {
     ASSERT_EQUAL(hash_indices[0], 81566);
 
 
-    FM fm3 = FM(pow(2, bit), k, e1);
+    FM fm3 = FM(pow(2, bit), k, w_reg, v_reg, learning_rate, stdev, e1);
 
     initial_error = 0.0;
     guess = fm3.predict({2, 6}, {1.0, 1.0});
